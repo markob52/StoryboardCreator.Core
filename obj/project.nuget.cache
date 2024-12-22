@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "SW1naYxfN68=",
+  "dgSpecHash": "eWzNfUo2qS8=",
   "success": true,
   "projectFilePath": "/home/bosko/git_dir/StoryboardCreator/StoryboardCreator.Core/StoryboardCreator.Core.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/bosko/.nuget/packages/messagepack/3.1.0/messagepack.3.1.0.nupkg.sha512",
+    "/home/bosko/.nuget/packages/messagepack.annotations/3.1.0/messagepack.annotations.3.1.0.nupkg.sha512",
+    "/home/bosko/.nuget/packages/messagepackanalyzer/3.1.0/messagepackanalyzer.3.1.0.nupkg.sha512",
+    "/home/bosko/.nuget/packages/microsoft.net.stringtools/17.11.4/microsoft.net.stringtools.17.11.4.nupkg.sha512"
+  ],
   "logs": []
 }

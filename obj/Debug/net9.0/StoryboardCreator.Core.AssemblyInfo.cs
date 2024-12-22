@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StoryboardCreator.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6e84c70d778e049cce0b43e8b475e947961f0c9a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+66406bb5d2fcbd04ad96a94fdfd87294767e1aa1")]
 [assembly: System.Reflection.AssemblyProductAttribute("StoryboardCreator.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StoryboardCreator.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
