@@ -21,5 +21,12 @@ public class Shot
     /// <summary>
     /// Name of an image file stored in cache or in the shots object file
     /// </summary>
-    public string? ImageFileName { get; set; }
+    public string? ImageFileName { get; internal set; }
+    
+    
+    [Obsolete("Only for testing")]
+    public void SetImageFileName(string name)
+    {
+        ImageFileName = name;
+    }
 }

@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
 using MessagePack;
 
 namespace StoryboardCreator.Core;
@@ -6,8 +7,8 @@ namespace StoryboardCreator.Core;
 /// <summary>
 /// An object that represents a storyboard
 /// </summary>
-[MessagePackObject(true)]
-public class Storyboard
+[MessagePackObject(keyAsPropertyName: true, AllowPrivate = true )]
+public partial class Storyboard
 {
     /// <summary>
     /// Title of the storyboard
@@ -20,9 +21,15 @@ public class Storyboard
     public string Author { get; set; } = string.Empty;
 
     /// <summary>
-    /// Shots that the Storyboard contain
+    /// ShotList that the Storyboard contain
     /// </summary>
-    private List<Shot> Shots { get; } = [];
+    private List<Shot> ShotList { get; set; } = new List<Shot>();
+    
+    /// <summary>
+    /// Public Readonly interface to the ShotList
+    /// </summary>
+    [IgnoreMember]
+    public IReadOnlyList<Shot> Shots => ShotList.AsReadOnly();
 
     /// <summary>
     /// Image Cache controller of the storyboard
@@ -45,15 +52,15 @@ public class Storyboard
     public void AddShot(int id, Shot? shot = null, string? imagePath = null)
     {
         shot ??= new Shot();
-        if (id >= Shots.Count || id == -1)
+        if (id >= ShotList.Count || id == -1)
         {
-            Shots.Add(shot);
+            ShotList.Add(shot);
             if (imagePath != null)
-                AddImageToShot(imagePath, Shots.Count - 1);
+                AddImageToShot(imagePath, ShotList.Count - 1);
         }
         else
         {
-            Shots.Insert(id, shot);
+            ShotList.Insert(id, shot);
             if (imagePath != null)
                 AddImageToShot(imagePath, id);
         }
@@ -66,7 +73,7 @@ public class Storyboard
     /// <param name="id">ID of that Shot to which the image is added</param>
     public void AddImageToShot(string imagePath, int id)
     {
-        Shots[id].ImageFileName = ImageCacheControl.AddImage(imagePath);
+        ShotList[id].ImageFileName = ImageCacheControl.AddImage(imagePath);
     }
 
     /// <summary>
@@ -76,10 +83,10 @@ public class Storyboard
     /// <param name="id2">Id of the second shot</param>
     public void SwitchShots(int id1, int id2)
     {
-        var temp = Shots[id1];
-        Shots.RemoveAt(id1);
-        Shots[id1] = Shots[id2];
-        Shots[id2] = temp;
+        var temp = ShotList[id1];
+        ShotList.RemoveAt(id1);
+        ShotList[id1] = ShotList[id2];
+        ShotList[id2] = temp;
     }
 
     /// <summary>
@@ -89,9 +96,9 @@ public class Storyboard
     /// <param name="newId">New id</param>
     public void MoveShot(int oldId, int newId)
     {
-        var temp = Shots[oldId];
-        Shots.RemoveAt(oldId);
-        Shots.Insert(newId, temp);
+        var temp = ShotList[oldId];
+        ShotList.RemoveAt(oldId);
+        ShotList.Insert(newId, temp);
     }
 
     /// <summary>
@@ -100,7 +107,7 @@ public class Storyboard
     /// <param name="id"></param>
     public void RemoveShot(int id)
     {
-        Shots.RemoveAt(id);
+        ShotList.RemoveAt(id);
     }
 
     /// <summary>
@@ -110,7 +117,7 @@ public class Storyboard
     /// <returns></returns>
     public Shot GetShot(int id)
     {
-        return Shots[id];
+        return ShotList[id];
     }
 
 
@@ -126,7 +133,7 @@ public class Storyboard
         var coreDataPath = Path.Combine(projPath, "core.msgpack");
         var storyboard = MessagePackSerializer.Deserialize<Storyboard>(File.ReadAllBytes(coreDataPath));
         storyboard.ImageCacheControl = new ImageCacheController(Path.Combine(projPath, "Images"));
-        storyboard.CachePath = coreDataPath;
+        storyboard.CachePath = projPath;
         return storyboard;
     }
 
@@ -138,27 +145,32 @@ public class Storyboard
     {
         var tempPath = Path.Combine(Path.GetTempPath(), "StoryboardCreator");
         Directory.CreateDirectory(tempPath);
+        if (Directory.GetFiles(tempPath).Length == 0)
+        {
+            return Path.Combine(tempPath, "0");
+        }
         var projPath = (Directory.GetFiles(tempPath)
             .Select(s =>
                 long.Parse(s.Replace(Path.GetExtension(s), "")))
             .Max() + 1).ToString();
-        return projPath;
+        return Path.Combine(tempPath,projPath);
     }
 
     /// <summary>
     /// Saves the Storyboard to the project file
     /// </summary>
     /// <param name="path">Path where that file will be saved</param>
-    private void Save(string path)
+    public void Save(string path)
     {
         File.WriteAllBytes(Path.Combine(CachePath, "core.msgpack"), MessagePackSerializer.Serialize(this));
+        if(File.Exists(path)) File.Delete(path);
         ZipFile.CreateFromDirectory(CachePath, path);
     }
 
     /// <summary>
     /// Deletes the Cache
     /// </summary>
-    private void Close()
+    public void Close()
     {
         Directory.Delete(CachePath, true);
         if (Directory.GetFiles(Directory.GetParent(CachePath)?.ToString() ?? string.Empty).Length == 0)

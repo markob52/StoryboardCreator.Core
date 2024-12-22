@@ -10,12 +10,12 @@ public class ImageCacheController
     /// <summary>
     /// Path of  Image Cache
     /// </summary>
-    private string CachePath { get; }
+    public string CachePath { get; }
 
     /// <summary>
     /// ID of the last image
     /// </summary>
-    private long LastId { get; set; } = 0;
+    public long LastId { get; set; } = -1;
 
     /// <summary>
     /// Generate new Image Cache(if it exists keep load its content)
@@ -24,9 +24,12 @@ public class ImageCacheController
     public ImageCacheController(string path)
     {
         CachePath = path;
-        var files = Directory.GetFiles(CachePath);
         Directory.CreateDirectory(CachePath);
-        LastId = files.Select(s => long.Parse(s.Replace(Path.GetExtension(s), ""))).Max();
+        var files = Directory.GetFiles(CachePath);
+        if (files.Length != 0)
+        {
+            LastId = files.Select(s => long.Parse(Path.GetFileNameWithoutExtension(s))).Max();
+        }
     }
 
     /// <summary>
